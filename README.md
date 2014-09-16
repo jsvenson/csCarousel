@@ -1,0 +1,4 @@
+csCarousel
+==========
+
+jQuery Carousel plugin
