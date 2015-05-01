@@ -1,5 +1,5 @@
 (function($) {
-  var self, options;
+  var self, options, iframeOptions;
   var statePlaying = 'playing';
   var statePaused = 'paused';
   var stateStopped = 'stopped';
@@ -12,8 +12,14 @@
         'nextButton'    : null, // jQuery object
         'prevButton'    : null, // jQuery object
         'playPauseButton' : null, // jQuery object
-        'pauseOnHover'  : true
+        'pauseOnHover'  : true,
+        'useIFrames': false
       }, opts);
+      
+      iframeOptions = {
+        width: '100%',
+        height: '100%'
+      };
       
       return this.each(function() {
         if (options.slides.length < 1) return;
@@ -46,35 +52,42 @@
           });
         }
         
-        if (options['pauseOnHover'])
+        if (options.pauseOnHover) {
           self.hover(function() {
             if (!self.csCarousel('isStopped')) self.csCarousel('playPause');
           });
+        }
         
-        if (options['nextButton'] != null) {
+        if (options.nextButton != null) {
           options['nextButton'].click(function() {
             self.csCarousel('next', true);
             return false;
           });
         }
         
-        if (options['prevButton'] != null) {
+        if (options.prevButton != null) {
           options['prevButton'].click(function() {
             self.csCarousel('prev', true);
             return false;
           });
         }
         
-        if (options['playPauseButton'] != null) {
+        if (options.playPauseButton != null) {
           options['playPauseButton'].click(function() {
             self.data('csCarousel').state == statePlaying? self.csCarousel('stop') : self.csCarousel('start');
             return false;
           });
         }
         
-        $('<div/>').addClass('slide current').load(options.slides[0].url).appendTo(self);
-        $('<div/>').addClass('slide incoming').load(options.slides[1 % options.slides.length].url).appendTo(self);
-        $('<div/>').addClass('slide outgoing').load(options.slides[options.slides.length - 1].url).appendTo(self);
+        if (options.useIFrames) {
+          $('<div/>').addClass('slide current').append($('<iframe/>').attr($.extend({src: options.slides[0].url}, iframeOptions))).appendTo(self);
+          $('<div/>').addClass('slide incoming').append($('<iframe/>').attr($.extend({src: options.slides[1 % options.slides.length].url}, iframeOptions))).appendTo(self);
+          $('<div/>').addClass('slide outgoing').append($('<iframe/>').attr($.extend({src: options.slides[options.slides.length - 1].url}, iframeOptions))).appendTo(self);
+        } else {
+          $('<div/>').addClass('slide current').load(options.slides[0].url).appendTo(self);
+          $('<div/>').addClass('slide incoming').load(options.slides[1 % options.slides.length].url).appendTo(self);
+          $('<div/>').addClass('slide outgoing').load(options.slides[options.slides.length - 1].url).appendTo(self);
+        }
         
         $this.data('csCarousel').setTimer();
       });
@@ -87,10 +100,16 @@
         self.find('.slide.outgoing').remove();
         self.find('.slide.current').toggleClass('current outgoing'); // .slide.current -> .slide.outgoing
         self.find('.slide.incoming').toggleClass('current incoming'); // .slide.incoming -> .slide.current
-      
-        $('<div/>').addClass('slide incoming') // load .slide.incoming
-          .load(options.slides[(idx + 1) % options.slides.length].url)
-          .appendTo(self);
+        
+        if (options.useIFrames) {
+          $('<div/>').addClass('slide incoming')
+            .append($('<iframe/>').attr($.extend({src: options.slides[(idx + 1) % options.slides.length].url}, iframeOptions)))
+            .appendTo(self);
+        } else {
+          $('<div/>').addClass('slide incoming') // load .slide.incoming
+            .load(options.slides[(idx + 1) % options.slides.length].url)
+            .appendTo(self);
+        }
       
         self.data('csCarousel').index = idx;
       }
@@ -109,10 +128,16 @@
         self.find('.slide.incoming').remove();
         self.find('.slide.current').toggleClass('current incoming');
         self.find('.slide.outgoing').toggleClass('current outgoing');
-      
-        $('<div/>').addClass('slide outgoing')
-          .load(options.slides[incoming_idx].url)
-          .appendTo(self);
+        
+        if (options.useIFrames) {
+          $('<div/>').addClass('slide outgoing')
+            .append($('<iframe/>').attr({height: '100%', width: '100%', seamless: true, src: options.slides[incoming_idx].url}))
+            .appendTo(self);
+        } else {
+          $('<div/>').addClass('slide outgoing')
+            .load(options.slides[incoming_idx].url)
+            .appendTo(self);
+        }
       
         self.data('csCarousel').index = idx;
       }
