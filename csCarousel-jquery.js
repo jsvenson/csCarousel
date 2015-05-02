@@ -13,13 +13,12 @@
         'prevButton'    : null, // jQuery object
         'playPauseButton' : null, // jQuery object
         'pauseOnHover'  : true,
-        'useIFrames': false
+        'useIFrames': false,
+        iframeOptions: {
+          width: '100%',
+          height: '100%'
+        }
       }, opts);
-      
-      iframeOptions = {
-        width: '100%',
-        height: '100%'
-      };
       
       return this.each(function() {
         if (options.slides.length < 1) return;
@@ -80,9 +79,9 @@
         }
         
         if (options.useIFrames) {
-          $('<div/>').addClass('slide current').append($('<iframe/>').attr($.extend({src: options.slides[0].url}, iframeOptions))).appendTo(self);
-          $('<div/>').addClass('slide incoming').append($('<iframe/>').attr($.extend({src: options.slides[1 % options.slides.length].url}, iframeOptions))).appendTo(self);
-          $('<div/>').addClass('slide outgoing').append($('<iframe/>').attr($.extend({src: options.slides[options.slides.length - 1].url}, iframeOptions))).appendTo(self);
+          $('<div/>').addClass('slide current').append($('<iframe/>').attr($.extend({src: options.slides[0].url}, options.iframeOptions))).appendTo(self);
+          $('<div/>').addClass('slide incoming').append($('<iframe/>').attr($.extend({src: options.slides[1 % options.slides.length].url}, options.iframeOptions))).appendTo(self);
+          $('<div/>').addClass('slide outgoing').append($('<iframe/>').attr($.extend({src: options.slides[options.slides.length - 1].url}, options.iframeOptions))).appendTo(self);
         } else {
           $('<div/>').addClass('slide current').load(options.slides[0].url).appendTo(self);
           $('<div/>').addClass('slide incoming').load(options.slides[1 % options.slides.length].url).appendTo(self);
@@ -103,7 +102,7 @@
         
         if (options.useIFrames) {
           $('<div/>').addClass('slide incoming')
-            .append($('<iframe/>').attr($.extend({src: options.slides[(idx + 1) % options.slides.length].url}, iframeOptions)))
+            .append($('<iframe/>').attr($.extend({src: options.slides[(idx + 1) % options.slides.length].url}, options.iframeOptions)))
             .appendTo(self);
         } else {
           $('<div/>').addClass('slide incoming') // load .slide.incoming
@@ -131,7 +130,7 @@
         
         if (options.useIFrames) {
           $('<div/>').addClass('slide outgoing')
-            .append($('<iframe/>').attr({height: '100%', width: '100%', seamless: true, src: options.slides[incoming_idx].url}))
+            .append($('<iframe/>').attr($.extend({src: options.slides[incoming_idx].url}, options.iframeOptions)))
             .appendTo(self);
         } else {
           $('<div/>').addClass('slide outgoing')
